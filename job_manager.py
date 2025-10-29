@@ -16,9 +16,12 @@ class JobManager:
         return f"JobManager(jobs={self.jobs})"
 
     def add_job(self, job):
-        current_hours = sum(job.get_hours() for job in self.jobs)
+        current_hours = sum(
+            j.get_hours() for j in self.jobs
+            if j.get_name() == job.get_name() and j.get_date() == job.get_date()
+        )
         if current_hours + job.get_hours() > 8:
-            raise ValueError("Total hours can not be greater than 8")
+            raise ValueError(f"Total hours for {job.get_name()} on {job.get_date()} cannot exceed 8")
         self.jobs.append(job)
 
     def remove_job(self, job):
@@ -28,9 +31,17 @@ class JobManager:
         if old_job not in self.jobs:
             raise ValueError("Job does not exist")
 
-        current_hours = sum(job.get_hours() for job in self.jobs) - old_job.get_hours()
+            # Hours for this worker on this date excluding the old job
+        current_hours = sum(
+            j.get_hours() for j in self.jobs
+            if j.get_name() == old_job.get_name() and j.get_date() == old_job.get_date() and j != old_job
+        )
+
         if current_hours + new_job.get_hours() > 8:
-            raise ValueError("Total hours can not be greater than 8")
+            raise ValueError(f"Total hours for {new_job.get_name()} on {new_job.get_date()} cannot exceed 8")
+
+        index = self.jobs.index(old_job)
+        self.jobs[index] = new_job
 
         index = self.jobs.index(old_job)
         self.jobs[index] = new_job
@@ -66,6 +77,7 @@ class JobManager:
     def load_from_file(self, file_name):
         with open(file_name, mode='r', newline='') as file:
             reader = csv.reader(file)
+            next(reader)  # skip header row
             for row in reader:
                 name, category, rate, date, hours = row
                 job = Job(name, category, float(rate), date, int(hours))
@@ -74,6 +86,7 @@ class JobManager:
     def save_to_file(self, file_name):
         with open(file_name, mode='w', newline='') as file:
             writer = csv.writer(file)
+            writer.writerow(["name", "category", "rate", "date", "hours"])  # header
             for job in self.jobs:
                 writer.writerow([job.get_name(), job.get_category(),
                                  job.get_rate(), job.get_date(), job.get_hours()])
