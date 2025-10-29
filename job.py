@@ -1,5 +1,12 @@
 class Job:
 
+    """
+    A single job with attributes:
+    name, category, rate, date, hours
+    Ensures valid input types and
+    0 < hour <= 6, 0 < rate
+    """
+
     def __init__(self, name, category, rate, date, hours):
         if not isinstance(name, str):
             raise TypeError('name must be a string')
@@ -19,37 +26,37 @@ class Job:
         if rate <= 0:
             raise ValueError('Rate must be positive')
 
-        self.name = name
-        self.category = category
-        self.rate = rate
-        self.date = date
-        self.hours = hours
+        self._name = name
+        self._category = category
+        self._rate = rate
+        self._date = date
+        self._hours = hours
 
     def get_name(self):
-        return self.name
+        return self._name
 
     def get_category(self):
-        return self.category
+        return self._category
 
     def get_rate(self):
-        return self.rate
+        return self._rate
 
     def get_date(self):
-        return self.date
+        return self._date
 
     def get_hours(self):
-        return self.hours
+        return self._hours
 
     def __eq__(self, other):
         if not isinstance(other, Job):
             return False
-        return self.name == other.name and self.category == other.category and self.rate == other.rate and self.date == other.date and self.hours == other.hours
+        return self._name == other._name and self._category == other._category and self._rate == other._rate and self._date == other._date and self._hours == other._hours
 
     def __hash__(self):
-        return hash((self.name, self.category, self.rate, self.date, self.hours))
+        return hash((self._name, self._category, self._rate, self._date, self._hours))
 
     def __str__(self):
-        return f"Job({self.name} {self.category} {self.rate} {self.date} {self.hours})"
+        return f"Job({self._name} {self._category} {self._rate} {self._date} {self._hours})"
 
     def __repr__(self):
         return self.__str__()
